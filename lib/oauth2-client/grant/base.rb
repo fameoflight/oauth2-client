@@ -4,7 +4,7 @@ module OAuth2Client
       include OAuth2Client::UrlHelper
 
       class InvalidAuthorizationTypeError < StandardError; end
-  
+
       attr_accessor :client_id, :client_secret, :connection, :host,
                     :authorize_path, :token_path, :device_path
 
@@ -18,20 +18,20 @@ module OAuth2Client
         @device_path    = client.device_path
       end
 
-      def make_request(method, path, opts={})
+      def make_request(method, path, opts = {})
         if auth_type = opts.delete(:authenticate)
           case auth_type.to_sym
           when :body
             opts[:params] ||= {}
             opts[:params].merge!({
-              :client_id     => @client_id,
-              :client_secret => @client_secret
-            })
+                                   client_id: @client_id,
+                                   client_secret: @client_secret
+                                 })
           when :headers
             opts[:headers] ||= {}
             opts[:headers]['Authorization'] = http_basic_encode(@client_id, @client_secret)
           else
-            #do nothing
+            # do nothing
           end
         end
         @connection.send_request(method, path, opts)

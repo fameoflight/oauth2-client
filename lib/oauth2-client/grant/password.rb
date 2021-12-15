@@ -1,7 +1,6 @@
 module OAuth2Client
   module Grant
     class Password < Base
-
       def grant_type
         'password'
       end
@@ -12,13 +11,13 @@ module OAuth2Client
       # @param password
       # @param [Hash] params additional params
       # @param [Hash] opts options
-      def get_token(username, password, opts={})
+      def get_token(username, password, opts = {})
         opts[:params] ||= {}
         opts[:params].merge!({
-          :grant_type => grant_type,
-          :username   => username,
-          :password   => password
-        })
+                               grant_type: grant_type,
+                               username: username,
+                               password: password
+                             })
         opts[:authenticate] ||= :headers
         method = opts.delete(:method) || :post
         make_request(method, @token_path, opts)

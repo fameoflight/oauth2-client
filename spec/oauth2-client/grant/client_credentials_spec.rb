@@ -1,7 +1,6 @@
-require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../../spec_helper', __dir__)
 
 describe OAuth2Client::Grant::ClientCredentials do
-
   before :all do
     @host           = 'example.com'
     @client_id      = 's6BhdRkqt3'
@@ -13,18 +12,18 @@ describe OAuth2Client::Grant::ClientCredentials do
     OAuth2Client::Grant::ClientCredentials.new(@client)
   end
 
-  describe "#grant_type" do
-    it "returns grant type" do
+  describe '#grant_type' do
+    it 'returns grant type' do
       expect(subject.grant_type).to eq 'client_credentials'
     end
   end
 
-  describe "#get_token" do
-    it "exchanges authorization code for access token" do
-      subject.should_receive(:make_request).with(:post, "/oauth2/token", {
-        :params => {:grant_type=>"client_credentials"},
-        :authenticate=>:headers
-      })
+  describe '#get_token' do
+    it 'exchanges authorization code for access token' do
+      subject.should_receive(:make_request).with(:post, '/oauth2/token', {
+                                                   params: { grant_type: 'client_credentials' },
+                                                   authenticate: :headers
+                                                 })
       subject.get_token
     end
   end

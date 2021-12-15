@@ -1,7 +1,7 @@
 begin
   require 'net/https'
 rescue LoadError
-  warn "Warning: no such file to load -- net/https. Make sure openssl is installed if you want ssl support"
+  warn 'Warning: no such file to load -- net/https. Make sure openssl is installed if you want ssl support'
   require 'net/http'
 end
 require 'zlib'
@@ -9,7 +9,6 @@ require 'addressable/uri'
 
 module OAuth2Client
   class HttpConnection
-
     class UnhandledHTTPMethodError < StandardError; end
     class UnsupportedSchemeError < StandardError; end
 
@@ -23,7 +22,7 @@ module OAuth2Client
       Net::HTTPHeaderSyntaxError,
       Net::ProtocolError,
       SocketError,
-      Zlib::GzipFile::Error,
+      Zlib::GzipFile::Error
     ]
 
     attr_accessor :config, :scheme, :host, :port, :max_redirects, :ssl,
@@ -31,16 +30,16 @@ module OAuth2Client
 
     def self.default_options
       {
-        :headers => {
-          'Accept'     => 'application/json',
+        headers: {
+          'Accept' => 'application/json',
           'User-Agent' => "OAuth2 Ruby Gem #{OAuth2Client::Version}"
         },
-        :ssl => {:verify => true},
-        :max_redirects => 5
+        ssl: { verify: true },
+        max_redirects: 5
       }
     end
 
-    def initialize(url, options={})
+    def initialize(url, options = {})
       @uri = Addressable::URI.parse(url)
       self.class.default_options.keys.each do |key|
         instance_variable_set(:"@#{key}", options.fetch(key, self.class.default_options[key]))
@@ -52,9 +51,10 @@ module OAuth2Client
     end
 
     def scheme=(scheme)
-      unless ['http', 'https'].include? scheme
-        raise UnsupportedSchemeError.new "#{scheme} is not supported, only http and https"
+      unless %w[http https].include? scheme
+        raise UnsupportedSchemeError, "#{scheme} is not supported, only http and https"
       end
+
       @scheme = scheme
     end
 
@@ -71,20 +71,21 @@ module OAuth2Client
       @port = @uri.port || _port
     end
 
-    def absolute_url(path='')
+    def absolute_url(path = '')
       "#{scheme}://#{host}#{path}"
     end
 
     def ssl?
-      scheme == "https" ? true : false
+      scheme == 'https'
     end
 
     def ssl=(opts)
       raise "Expected Hash but got #{opts.class.name}" unless opts.is_a?(Hash)
+
       @ssl.merge!(opts)
     end
 
-    def http_connection(opts={})
+    def http_connection(opts = {})
       _host   = opts[:host]   || host
       _port   = opts[:port]   || port
       _scheme = opts[:scheme] || scheme
@@ -96,17 +97,15 @@ module OAuth2Client
       @http_client
     end
 
-    def send_request(method, path, opts={})
+    def send_request(method, path, opts = {})
       headers         = @headers.merge(opts.fetch(:headers, {}))
       params          = opts[:params] || {}
       query           = Addressable::URI.form_encode(params)
       method          = method.to_sym
-      normalized_path = query.empty? ? path : [path, query].join("?")
+      normalized_path = query.empty? ? path : [path, query].join('?')
       client          = http_connection(opts.fetch(:connection_options, {}))
 
-      if (method == :post || method == :put)
-        headers['Content-Type'] ||= 'application/x-www-form-urlencoded'
-      end
+      headers['Content-Type'] ||= 'application/x-www-form-urlencoded' if %i[post put].include?(method)
 
       case method
       when :get, :delete
@@ -114,7 +113,7 @@ module OAuth2Client
       when :post, :put
         response = client.send(method, path, query, headers)
       else
-        raise UnhandledHTTPMethodError.new("Unsupported HTTP method, #{method}")
+        raise UnhandledHTTPMethodError, "Unsupported HTTP method, #{method}"
       end
 
       status = response.code.to_i
@@ -129,11 +128,12 @@ module OAuth2Client
           end
           redirect_uri = Addressable::URI.parse(response.header['Location'])
           conn = {
-            :scheme => redirect_uri.scheme,
-            :host   => redirect_uri.host,
-            :port   => redirect_uri.port
+            scheme: redirect_uri.scheme,
+            host: redirect_uri.host,
+            port: redirect_uri.port
           }
-          return send_request(method, redirect_uri.path, :params => params, :headers => headers, :connection_options => conn)
+          return send_request(method, redirect_uri.path, params: params, headers: headers,
+                                                         connection_options: conn)
         end
       when 100..599
         @redirect_count = 0
@@ -142,10 +142,10 @@ module OAuth2Client
       end
       response
     rescue *NET_HTTP_EXCEPTIONS
-      raise "Error::ConnectionFailed, $!"
+      raise 'Error::ConnectionFailed, $!'
     end
 
-  private
+    private
 
     def configure_ssl(http)
       http.use_ssl      = true
@@ -162,14 +162,15 @@ module OAuth2Client
 
     def ssl_verify_mode
       if ssl.fetch(:verify, true)
-          OpenSSL::SSL::VERIFY_PEER
+        OpenSSL::SSL::VERIFY_PEER
       else
-          OpenSSL::SSL::VERIFY_NONE
+        OpenSSL::SSL::VERIFY_NONE
       end
     end
 
     def ssl_cert_store
       return ssl[:cert_store] if ssl[:cert_store]
+
       cert_store = OpenSSL::X509::Store.new
       cert_store.set_default_paths
       cert_store

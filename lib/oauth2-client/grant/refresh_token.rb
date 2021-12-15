@@ -1,7 +1,6 @@
 module OAuth2Client
   module Grant
     class RefreshToken < Base
-
       def grant_type
         'refresh_token'
       end
@@ -11,12 +10,12 @@ module OAuth2Client
       # @param [String] refresh_token     refresh token
       # @param [Hash]   params additional params
       # @param [Hash]   opts options
-      def get_token(refresh_token, opts={})
-        params  = opts[:params] || {}
+      def get_token(refresh_token, opts = {})
+        params = opts[:params] || {}
         opts[:params] = params.merge!({
-          :grant_type    => grant_type,
-          :refresh_token => refresh_token 
-        })
+                                        grant_type: grant_type,
+                                        refresh_token: refresh_token
+                                      })
         opts[:authenticate] ||= :headers
         method = opts.delete(:method) || :post
         make_request(method, @token_path, opts)

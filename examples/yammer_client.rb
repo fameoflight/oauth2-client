@@ -1,10 +1,10 @@
 class YammerClient < OAuth2Client::Client
-
   def initialize(*args)
     super
     @token_path     = '/oauth2/token'
     @authorize_path = '/dialog/oauth/authorize'
   end
+
   # Generates the Yammer URL that the user will be redirected to in order to
   # authorize your application
   #
@@ -19,7 +19,7 @@ class YammerClient < OAuth2Client::Client
   # >> https://www.yammer.com/dialog/oauth/?client_id={client_id}&
   #    redirect_uri=http%3A%2F%2Flocalhost%2Foauth%2Fcb&response_type=token
   #
-  def clientside_authorization_url(opts={})
+  def clientside_authorization_url(opts = {})
     implicit.token_url(opts)
   end
 
@@ -37,7 +37,7 @@ class YammerClient < OAuth2Client::Client
   # >> https://www.yammer.com/dialog/oauth/?client_id={client_id}&
   #    redirect_uri=http%3A%2F%2Flocalhost%2Foauth%2Fcb&response_type=code
   #
-  def webserver_authorization_url(opts={})
+  def webserver_authorization_url(opts = {})
     opts[:scope] = normalize_scope(opts[:scope]) if opts[:scope]
     authorization_code.authorization_url(opts)
   end
@@ -59,7 +59,7 @@ class YammerClient < OAuth2Client::Client
   #    redirect_uri=http%3A%2F%2Flocalhost%2Foauth%2Fcb&client_secret={client_secret}&
   #    grant_type=authorization_code&code=aXW2c6bYz
   #
-  def webserver_token_url(opts={})
+  def webserver_token_url(opts = {})
     opts[:scope] = normalize_scope(opts[:scope]) if opts[:scope]
     opts[:client_secret] = @client_secret
     authorization_code.token_path(opts)
@@ -85,10 +85,11 @@ class YammerClient < OAuth2Client::Client
   #  client_id={client_id}&code=G3Y6jU3a&grant_type=authorization_code&
   #  redirect_uri=http%3A%2F%2Flocalhost%2Foauth%2Fcb&client_secret={client_secret}
 
-  def exchange_auth_code_for_token(opts={})
-    unless (opts[:params] && opts[:params][:code])
-      raise ArgumentError.new("You must include an authorization code as a parameter")
+  def exchange_auth_code_for_token(opts = {})
+    unless opts[:params] && opts[:params][:code]
+      raise ArgumentError, 'You must include an authorization code as a parameter'
     end
+
     opts[:authenticate] ||= :body
     code = opts[:params].delete(:code)
     authorization_code.get_token(code, opts)

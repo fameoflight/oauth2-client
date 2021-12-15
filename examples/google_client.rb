@@ -1,5 +1,4 @@
 class GoogleClient < OAuth2Client::Client
-
   def initialize(*args)
     super
     @token_path = '/o/oauth2/token'
@@ -26,7 +25,7 @@ class GoogleClient < OAuth2Client::Client
   #      :approval_prompt => 'force',
   #    })
   # #=>
-  def clientside_authorization_url(params={})
+  def clientside_authorization_url(params = {})
     params[:scope] = normalize_scope(params[:scope]) if params[:scope]
     implicit.token_url(params)
   end
@@ -50,7 +49,7 @@ class GoogleClient < OAuth2Client::Client
   #      :approval_prompt => 'force',
   #    })
   # #=>
-  def webserver_authorization_url(params={})
+  def webserver_authorization_url(params = {})
     params[:scope] = normalize_scope(params[:scope]) if params[:scope]
     authorization_code.authorization_url(params)
   end
@@ -73,10 +72,11 @@ class GoogleClient < OAuth2Client::Client
   #      :code => 'G3Y6jU3a',
   #    })
   # #=>
-  def exchange_auth_code_for_token(opts={})
-    unless (opts[:params] && opts[:params][:code])
-      raise ArgumentError.new("You must include an authorization code as a parameter")
+  def exchange_auth_code_for_token(opts = {})
+    unless opts[:params] && opts[:params][:code]
+      raise ArgumentError, 'You must include an authorization code as a parameter'
     end
+
     opts[:authenticate] ||= :body
     code = opts[:params].delete(:code)
     authorization_code.get_token(code, opts)
@@ -99,25 +99,25 @@ class GoogleClient < OAuth2Client::Client
   #      :refresh_token => '2YotnFZFEjr1zCsicMWpAA'
   #    })
   # #=>
-  def refresh_access_token(opts={})
-    unless (opts[:params] && opts[:params][:refresh_token])
-      raise ArgumentError.new("You must provide a refresh_token as a parameter")
+  def refresh_access_token(opts = {})
+    unless opts[:params] && opts[:params][:refresh_token]
+      raise ArgumentError, 'You must provide a refresh_token as a parameter'
     end
+
     opts[:authenticate] = :body
     token = opts[:params].delete(:refresh_token)
     refresh_token.get_token(token, opts)
   end
 
-
   # Generates the Google URL that allows a user to obtain an authorization
   # code for a given device
   #
   # @see https://developers.google.com/accounts/docs/OAuth2ForDevices
-  def device_authorization_url(params={})
+  def device_authorization_url(params = {})
     params[:scope] = normalize_scope(params[:scope]) if params[:scope]
     device.authorization_url(params)
   end
-  
+
   # @see https://developers.google.com/accounts/docs/OAuth2ForDevices#obtainingacode
   #
   # @params [Hash] additional parameters to be include in URL eg. state
@@ -131,7 +131,7 @@ class GoogleClient < OAuth2Client::Client
   #   :state => '/profile',
   # })
   # #=>
-  def get_device_code(opts={})
+  def get_device_code(opts = {})
     opts[:params] ||= {}
     opts[:params][:scope] = normalize_scope(opts[:params][:scope]) if opts[:params][:scope]
     device_code.get_code(opts)
@@ -151,10 +151,9 @@ class GoogleClient < OAuth2Client::Client
   #      :code => 'G3Y6jU3a',
   #    })
   # #=>
-  def exchange_device_code_for_token(opts={})
-    unless (opts[:params] && opts[:params][:code])
-      raise ArgumentError.new("You must include an device code as a parameter")
-    end
+  def exchange_device_code_for_token(opts = {})
+    raise ArgumentError, 'You must include an device code as a parameter' unless opts[:params] && opts[:params][:code]
+
     code = opts[:params].delete(:code)
     device_code.get_token(code, opts)
   end

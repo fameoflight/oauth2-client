@@ -10,29 +10,31 @@
 [gemnasium]: https://gemnasium.com/tiabas/oauth2-client
 [coveralls]: https://coveralls.io/r/tiabas/oauth2-client
 
-A Ruby wrapper based on the OAuth 2.0 specification for build oauth2 clients. It is designed with the philosophy that 
+A Ruby wrapper based on the OAuth 2.0 specification for build oauth2 clients. It is designed with the philosophy that
 many oauth2 providers implement OAuth 2.0 differently and not exactly according to the
-[RFC]( http://tools.ietf.org/html/rfc6749). With this gem, a developer has some degree of flexibilty in creating a 
-client that will work with different OAuth2 providers. This flexibilty comes at the same price of having to implement 
+[RFC](http://tools.ietf.org/html/rfc6749). With this gem, a developer has some degree of flexibilty in creating a
+client that will work with different OAuth2 providers. This flexibilty comes at the same price of having to implement
 a few things yourself. To that effect, an access token response is returned as an HTTPResponse from which the response
-body can be extracted. It turns out that not every oauth2 providers returns tokens in the same format. Therefore, rather 
+body can be extracted. It turns out that not every oauth2 providers returns tokens in the same format. Therefore, rather
 than make assumptions about the token response, this gem leaves that responsiblity to the developer.
 
-Bundled with the gem are working sample clients for Google, Yammer and Github. The structure of the clients is easy to 
+Bundled with the gem are working sample clients for Google, Yammer and Github. The structure of the clients is easy to
 follow thus making it possible to simply copy code from one client and simply substitute the rights credentials and request
 URL paths.
 
-For more about the standard checkout: http://tools.ietf.org/html/rfc6749 
+For more about the standard checkout: http://tools.ietf.org/html/rfc6749
 
 ## Installation
+
 ```sh
 gem install oauth2-client
 ```
 
 ## Resources
-* [View Source on GitHub][code]
-* [Report Issues on GitHub][issues]
-* [Website][website]
+
+- [View Source on GitHub][code]
+- [Report Issues on GitHub][issues]
+- [Website][website]
 
 [website]: http://tiabas.github.com/oauth2-client/
 [code]: https://github.com/tiabas/oauth2-client
@@ -51,6 +53,7 @@ client.authorization_code.authorization_path(:redirect_uri => 'http://localhost/
 ```
 
 ## Authorization Grants
+
 The client wraps around the creation of any given grant and passing in the parameters defined in the configuration
 file. The supported grants include Authorization Code, Implicit, Resource Owner Password Credentials, Client Credentials.
 There is also support for device authentication as described in Google's OAuth 2.0 authentication methods(https://developers.google.com/accounts/docs/OAuth2ForDevices). They are available via the `authorization_code`, `implicit`, `password`, `client_credentials`, `refresh_token`
@@ -61,38 +64,44 @@ case would be to treat all responses as JSON. However, some services may respond
 therefore, returns with an HTTPResponse object.
 
 ### Authorization Code
+
 ```ruby
 auth_url = client.authorization_code.authorization_path(:redirect_uri => 'http://localhost/oauth2/cb')
 # => "/oauth/authorize?response_type=code&client_id={client_id}&redirect_uri=http%3A%2F%2Flocalhost%2Foauth2%2Fcb"
 
 token_url = client.authorization_code.token_path(
-    :code => aXW2c6bYz, 
+    :code => aXW2c6bYz,
     :redirect_uri => 'http://localhost/oauth2/cb')
 # => "/oauth/token?redirect_uri=http%3A%2F%2Flocalhost%2Foauth%2Fcb&client_secret={client_secret}&grant_type=authorization_code&client_id={client_id}&code=aXW2c6bYz"
 ```
 
 ### Implicit Grant
+
 ```ruby
 auth_url = client.implicit.authorization_path(:redirect_uri => 'http://localhost/oauth2/cb')
 # => "oauth/?redirect_uri=http%3A%2F%2Flocalhost%2Foauth%2Fcb&response_type=token&client_id={client_id}"
 ```
 
 ### Password Credentials
+
 ```ruby
 token = client.password.get_token('username', 'password')
 ```
 
 ### Refresh Token
+
 ```ruby
 token = client.refresh_token.get_token(refresh_token_value, :params => {:scope => 'abc xyz', :state => 'state'})
 ```
 
 ### Client Credentials
+
 ```ruby
 token = client.client_credentials.get_token
 ```
 
 ### Device Code
+
 ```ruby
 auth_url = client.device_code.authorization_path(:scope => 'abc xyz', :state => 'state')
 # => "/oauth/device/code?scope=abc+xyz&state=state&client_id={client_id}"
@@ -102,12 +111,13 @@ token = client.device_code.get_token(device_auth_code)
 ```
 
 # Using a custom Http wrapper
+
 By default, oauth2-client uses a `Net::HTTP` wrapper called `OAuth2Client::HttpConnection`. However, if you wish to use a different HTTP library, you only
 need to create a wrapper around your favorite library that will respond to the `send_request` method.
 
 ```ruby
 class TyphoeusHttpConnection
-  
+
   def initialize(site_url, connection_options={})
     # set url and connection options
     @site_url = site_url
@@ -148,7 +158,8 @@ oauth_client = OAuth2Client::Client.new('example.com', client_id, client_secret,
 ```
 
 # Client Examples
-This library comes bundled with two sample implementations of Google and Yammer OAuth clients. These clients are 
+
+This library comes bundled with two sample implementations of Google and Yammer OAuth clients. These clients are
 meant to showcase the degree of flexibilty that you get when using this library to interact with other OAuth 2.0
 providers.
 
@@ -161,6 +172,7 @@ google_client = GoogleClient.new('https://accounts.google.com', '827502413694.ap
 ```
 
 ### Client-side authorization URL(Implicit grant)
+
 ```ruby
 
 # generate authorization url
@@ -173,6 +185,7 @@ auth_url = google_client.webserver_authorization_url(
 ```
 
 ### Server-side authorization URL(Authorization code grant)
+
 ```ruby
 
 # generate authorization url
@@ -190,7 +203,7 @@ response = google_client.exchange_auth_code_for_token(
     :redirect_uri => 'http://localhost/oauth/token'
   }
 )
-response.inspect 
+response.inspect
 # => #<Net::HTTPOK:0x007ff8bc7c1200>
 
 response.body
@@ -210,6 +223,7 @@ response.body
 gihub_client = GithubClient.new('https://github.com', '82f971d013e8d637a7e1', '1a1d59e1f8b8afa5f73e9dc9f17e25f7876e64ac')
 
 ```
+
 ### Server-side authorization URL(Authorization code grant)
 
 ```ruby
@@ -224,7 +238,7 @@ response = gihub_client.exchange_auth_code_for_token({
     :redirect_uri => 'https://localhost/callback',
   })
 
-response.inspect 
+response.inspect
 # => #<Net::HTTPOK:0x007ff8bc7c1200>
 
 response.body
@@ -235,18 +249,20 @@ response.body
 ```
 
 ## Supported Ruby Versions
+
 This library aims to support and is [tested against][travis] the following Ruby
 version:
 
-* Ruby 1.8.7
-* Ruby 1.9.2
-* Ruby 1.9.3
+- Ruby 1.8.7
+- Ruby 1.9.2
+- Ruby 1.9.3
 
 This library may inadvertently work (or seem to work) on other Ruby
 implementations, however support will only be provided for the versions listed
 above.
 
 ## Copyright
+
 Copyright (c) 2013 Kevin Mutyaba
 See [LICENSE][license] for details.
 [license]: https://github.com/tiabas/oauth2-client/blob/master/LICENSE

@@ -1,4 +1,4 @@
-$:.unshift File.expand_path('../../examples', __FILE__)
+$:.unshift File.expand_path('../examples', __dir__)
 
 require 'simplecov'
 require 'coveralls'
@@ -14,7 +14,7 @@ require 'rspec'
 require 'rspec/autorun'
 require 'webmock/rspec'
 
-WebMock.disable_net_connect!(:allow => 'coveralls.io')
+WebMock.disable_net_connect!(allow: 'coveralls.io')
 
 RSpec.configure do |config|
   config.mock_with :rspec

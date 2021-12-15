@@ -169,7 +169,7 @@ describe OAuth2Client::HttpConnection do
 
         stub_get('/oauth/authorize').with(
           query: params,
-          header: {
+          headers: {
             'Accept' => 'application/json',
             'User-Agent' => "OAuth2 Ruby Gem #{OAuth2Client::Version}",
             'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3'
@@ -183,7 +183,7 @@ describe OAuth2Client::HttpConnection do
     context 'when method is delete' do
       it 'returns an http response' do
         stub_delete('/users/1').with(
-          header: {
+          headers: {
             'Accept' => 'application/json',
             'User-Agent' => "OAuth2 Ruby Gem #{OAuth2Client::Version}",
             'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3'
@@ -199,7 +199,7 @@ describe OAuth2Client::HttpConnection do
         params = { first_name: 'john', last_name: 'smith' }
         stub_post('/users').with(
           body: params,
-          header: {
+          headers: {
             'Accept' => 'application/json',
             'User-Agent' => "OAuth2 Ruby Gem #{OAuth2Client::Version}",
             'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -217,7 +217,7 @@ describe OAuth2Client::HttpConnection do
 
         stub_put('/users/1').with(
           body: params,
-          header: {
+          headers: {
             'Accept' => 'application/json',
             'User-Agent' => "OAuth2 Ruby Gem #{OAuth2Client::Version}",
             'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',

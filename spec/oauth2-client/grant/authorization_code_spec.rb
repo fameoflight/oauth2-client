@@ -6,7 +6,9 @@ describe OAuth2Client::Grant::AuthorizationCode do
     @client_id      = 's6BhdRkqt3'
     @client_secret  = 'SplxlOBeZQQYbYS6WxSbIA'
     @client = OAuth2Client::Client.new(@host, @client_id, @client_secret)
-    OAuth2Client::Grant::AuthorizationCode.stub(:make_request)
+    RSpec::Mocks.with_temporary_scope do
+      OAuth2Client::Grant::AuthorizationCode.stub(:make_request)
+    end
   end
 
   subject do

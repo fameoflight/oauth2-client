@@ -175,18 +175,19 @@ describe GoogleClient do
 
   describe '#exchange_device_code_for_token' do
     it 'makes request to google to obtain an access token' do
-      stub_request(:post, 'https://827502413694.apps.googleusercontent.com:a2nQpcUm2Dgq1chWdAvbXGTk@accounts.google.com/o/oauth2/token').with(
-        body: {
-          grant_type: 'http://oauth.net/grant_type/device/1.0',
-          state: '/profile',
-          code: 'G3Y6jU3a'
-        },
-        headers: {
-          'Accept' => 'application/json',
-          'User-Agent' => "OAuth2 Ruby Gem #{OAuth2Client::Version}",
-          'Content-Type' => 'application/x-www-form-urlencoded'
-        }
-      )
+      stub_request(:post, 'https://accounts.google.com/o/oauth2/token')
+        .with(
+          body: { 'code' => 'G3Y6jU3a', 'grant_type' => 'http://oauth.net/grant_type/device/1.0',
+                  'state' => '/profile' },
+          headers: {
+            'Accept' => 'application/json',
+            'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+            'Authorization' => 'Basic ODI3NTAyNDEzNjk0LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tOmEyblFwY1VtMkRncTFjaFdkQXZiWEdUaw==',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'User-Agent' => 'OAuth2 Ruby Gem 2.0.0'
+          }
+        )
+        .to_return(status: 200, body: '', headers: {})
       subject.exchange_device_code_for_token(
         params: {
           state: '/profile',
